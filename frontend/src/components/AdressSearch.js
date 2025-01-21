@@ -1,23 +1,43 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { OpenStreetMapProvider} from 'leaflet-geosearch';
+
+// Fonction de debounce pour limiter les appels API
+const useDebounce = (value, delay) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+};
 
 const AdressSearch = ({onAddressSelect}) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const provider = new OpenStreetMapProvider();
+    const debouncedQuery = useDebounce(query, 500);  // Attente de 500ms avant d’exécuter la recherche
 
-    const handleSearch = async (event) => {
-        const value = event.target.value;
-        setQuery(value);
+    useEffect(() => {
+        const fetchData = async () => {
+            if (debouncedQuery.length > 2) {
+                // Effectuer la recherche seulement si la requête a plus de 2 caractères
+                const searchResults = await provider.search({ query: debouncedQuery });
+                setResults(searchResults);
+            } else {
+                setResults([]);
+            }
+        };
 
-        if (value.length > 2) {
-            const searchResults = await provider.search({ query: value});
-            setResults(searchResults);
-            console.log(searchResults);
-        }else {
-            setResults([]);
-        }
-    };
+        // Lancer la recherche uniquement si la requête a changé
+        fetchData();
+    }, [debouncedQuery]);  
 
     const handleSelect = (result) => {
         setQuery(result.label);
@@ -30,7 +50,7 @@ const AdressSearch = ({onAddressSelect}) => {
             <input
             type="text"
             value={query}
-            onChange={handleSearch}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Entrez une adresse ..."/>
              <ul style={{ listStyleType: 'none', padding: 0 }}>
             {results.map((result, index) => (

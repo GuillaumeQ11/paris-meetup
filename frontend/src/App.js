@@ -7,15 +7,24 @@ import 'leaflet/dist/leaflet.css';
 
 function App() {
 
-  const [addresses, setAddresses] = useState([
-    { address: "Friend 1", lat: 48.8584, lng: 2.2945 }, // Exemple : Tour Eiffel
-    { address: "Friend 2", lat: 48.853, lng: 2.3499 },  // Exemple : Musée du Louvre
-  ]);
+  const [addresses, setAddresses] = useState([null, null]);
+  const [midpoint, setMidpoint] = useState(null);
+
+  const calculateMidPoint = () => {
+    if (addresses.some((addr) => addr === null)) return; // Vérifie que toutes les adresses sont définies
+    const midLat = (addresses[0].lat + addresses[1].lat) / 2;
+    const midLng = (addresses[0].lng + addresses[1].lng) / 2;
+    setMidpoint({ lat: midLat, lng: midLng });
+  };
+
 
   return (
     <div className='Paris Meetup'>
       <h1>Paris Meetup</h1>
       <AdressForm/>
+      <button onClick={calculateMidPoint}>
+        Où se retrouver ?
+      </button>
       <Map locations={addresses}></Map>
     </div>
     

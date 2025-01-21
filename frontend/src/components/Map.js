@@ -20,13 +20,19 @@ const Map = ({locations = []}) => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {locations.map((loc, index) => (
-            <Marker key={index} position={new LatLng(loc.lat, loc.lng)} icon={customIcon}>
-              <Popup>{loc.address}</Popup>
-            </Marker>
-          ))}
+          {locations.length > 0 ? (
+                locations
+                    .filter(loc => loc && loc.lat !== undefined && loc.lng !== undefined)
+                    .map((loc, index) => (
+                        <Marker key={index} position={new LatLng(loc.lat, loc.lng)} icon={customIcon}>
+                            <Popup>{loc.label || "Adresse sélectionnée"}</Popup>
+                        </Marker>
+                    ))
+            ) : (
+                <></> // Pas de message visible sur la carte
+            )}
         </MapContainer>
-      );
-    };
+    );
+};
 
 export default Map;
