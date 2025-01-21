@@ -1,20 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
 import React, { useEffect, useState } from 'react';
+import AdressForm from './components/AdressForm';
+
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/')
-      .then(response => response.text())
-      .then(data => setMessage(data));
-  }, []);
-
   return (
-    <div>
-      <h1>{message}</h1>
+    <div className='Paris Meetup'>
+      <h1>Paris Meetup</h1>
+      <AdressForm/>
     </div>
-  );
+  )
 }
 
 export default App;
